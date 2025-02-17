@@ -1,0 +1,71 @@
+int codigo;
+int estado;
+int led1=5;
+int led2=7;
+int bocina=6;
+int sensor=A0;
+int contra=1234;
+
+void setup()
+{
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(sensor, INPUT);
+  pinMode(bocina, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  
+  if(estado==false)
+  {
+    Serial.println("INGRESA CODIGO DE ACTIVACION");
+    codigo=Serial.parseInt();
+    if(codigo==contra)
+    {
+      Serial.println("ALARMA ACTIVADA");
+      estado=true;
+    }
+  }
+  
+  if(estado==true)
+  {
+    codigo=Serial.parseInt();
+    if(codigo==contra)
+    {
+      Serial.println("ALARMA DESACTIVADA SIN MOVIMIENTO");
+      estado=false;
+    }
+  }
+  
+  if(estado==true)
+  {
+    if(digitalRead(sensor)==HIGH && estado==true)
+    {
+      Serial.println("MOVIMIENTO DETECTADO");
+      Serial.println("INGRESE EL CODIGO PARA DESACTIVAR LA ALARMA");
+      
+      while(estado==true)
+      {
+        tone(bocina,2500);
+        digitalWrite(led1, LOW);
+        digitalWrite(led2, HIGH);
+        delay(1000);
+        digitalWrite(led1, HIGH);
+        digitalWrite(led2, LOW);
+        
+        codigo=Serial.parseInt();
+        
+        if(contra==codigo)
+        {
+          Serial.println("ALARMA DESACTIVADA");
+          noTone(bocina);
+          estado=false;
+          digitalWrite(led1, LOW);
+        }
+      }
+    }
+  }
+
+}
